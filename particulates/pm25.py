@@ -12,7 +12,10 @@ class PM25:
     train_x = list()
     train_y = list()
     test_x = list()
-    pred_y = list()
+    pred_y_sk = list()
+    pred_y_tf_adagard = list()
+    pred_y_tf_sgd = list()
+    pred_y_tf_adam = list()
 
     def read_train(self, file=str()):
         """Read a CSV file."""
@@ -39,33 +42,79 @@ class PM25:
         """Train a model"""
         model = LinearRegression()
         model.fit(self.train_x, self.train_y)
-        self.pred_y = model.predict(self.test_x)
+        self.pred_y_sk = model.predict(self.test_x)
 
-    # def train_model_tensorflow(self):
-    #     lr = 0.00001
-    #     x = tf.constant(self.train_x, dtype=tf.float32)
-    #     y = tf.constant(self.train_y, dtype=tf.float32)
-    #     w = tf.Variable([[0.1] for _ in range(9)], dtype=tf.float32)
-    #     b = tf.Variable([np.zeros(shape=(1,))
-    #                      for _ in range(240)], dtype=tf.float32)
-    #     y_hat = tf.add(tf.matmul(x, w), b)
-    #     loss = tf.reduce_mean(tf.reduce_sum(tf.pow(y-y_hat, 2)))
+    def train_model_tensorflow(self):
+        self.lr = 0.1
+        self.x = tf.constant(self.train_x, dtype=tf.float32)
+        self.y = tf.constant(self.train_y, dtype=tf.float32)
 
-    #     optm_w, optm_b = self.tensor_GD(w[0], b[0], lr, loss, 0)
+        self.adagard()
+        self.sgd()
+        self.adam()
 
-    # def tensor_GD(self, w, b, lr, loss, _iter):
-    #     if _iter == '1000':
-    #         return w, b
-    #     else:
-    #         grad_w, grad_b = tf.gradients(loss, [w, b])
-    #         new_w = tf.assign(w, w - lr * grad_w)
-    #         new_b = tf.assign(b, b - lr * grad_b)
-    #         _iter += 1
-    #         return self.tensor_GD(new_w, new_b, _iter)
+    def adagard(self):
+        w = tf.Variable([[0.1] for _ in range(9)], dtype=tf.float32)
+        b = tf.Variable([np.zeros(shape=(1,))
+                         for _ in range(240)], dtype=tf.float32)
+
+        for _iter in range(100):
+            optimizer = tf.optimizers.Adagrad(self.lr)
+            with tf.GradientTape() as tape:
+                y_hat = tf.add(tf.matmul(self.x, w), b)
+                loss = tf.reduce_mean(tf.reduce_sum(tf.pow(self.y-y_hat, 2)))
+            gradients = tape.gradient(loss, [w, b])
+            optimizer.apply_gradients(zip(gradients, [w, b]))
+
+        test_x = tf.constant(self.test_x, dtype=tf.float32)
+        pred_y = tf.add(tf.matmul(test_x, w), b)
+        pred_y = pred_y.numpy().T
+        self.pred_y_tf_adagard = [elem for row in pred_y for elem in row]
+
+    def sgd(self):
+        w = tf.Variable([[0.1] for _ in range(9)], dtype=tf.float32)
+        b = tf.Variable([np.zeros(shape=(1,))
+                         for _ in range(240)], dtype=tf.float32)
+        for _iter in range(100):
+            optimizer = tf.optimizers.SGD(self.lr)
+            with tf.GradientTape() as tape:
+                y_hat = tf.add(tf.matmul(self.x, w), b)
+                loss = tf.reduce_mean(tf.reduce_sum(tf.pow(self.y-y_hat, 2)))
+            gradients = tape.gradient(loss, [w, b])
+            optimizer.apply_gradients(zip(gradients, [w, b]))
+
+        test_x = tf.constant(self.test_x, dtype=tf.float32)
+        pred_y = tf.add(tf.matmul(test_x, w), b)
+        pred_y = pred_y.numpy().T
+        self.pred_y_tf_sgd = [elem for row in pred_y for elem in row]
+
+    def adam(self):
+        w = tf.Variable([[0.1] for _ in range(9)], dtype=tf.float32)
+        b = tf.Variable([np.zeros(shape=(1,))
+                         for _ in range(240)], dtype=tf.float32)
+        for _iter in range(100):
+            optimizer = tf.optimizers.Adam(self.lr)
+            with tf.GradientTape() as tape:
+                y_hat = tf.add(tf.matmul(self.x, w), b)
+                loss = tf.reduce_mean(tf.reduce_sum(tf.pow(self.y-y_hat, 2)))
+            gradients = tape.gradient(loss, [w, b])
+            optimizer.apply_gradients(zip(gradients, [w, b]))
+
+        test_x = tf.constant(self.test_x, dtype=tf.float32)
+        pred_y = tf.add(tf.matmul(test_x, w), b)
+        pred_y = pred_y.numpy().T
+        self.pred_y_tf_adam = [elem for row in pred_y for elem in row]
 
     def draw(self):
         """Draw the figure"""
-        plt.plot(np.arange(len(self.pred_y)), np.array(
-            self.pred_y), 'r--', label='sk_learn')
+        plt.plot(np.arange(len(self.pred_y_sk)), np.array(
+            self.pred_y_sk), 'r--', label='sk')
+        plt.plot(np.arange(len(self.pred_y_tf_adagard)), np.array(
+            self.pred_y_tf_adagard), 'g--', label='tf_adagrad')
+        # plt.plot(np.arange(len(self.pred_y_tf_sgd)), np.array(
+        #     self.pred_y_tf_sgd), 'b--', label='tf_sgd')
+        # plt.plot(np.arange(len(self.pred_y_tf_adam)), np.array(
+        #     self.pred_y_tf_adam), 'r--', label='tf_adam')
+        plt.title('PM 2.5 prediction')
         plt.legend()
         plt.show()
