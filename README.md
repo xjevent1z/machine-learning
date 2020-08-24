@@ -7,4 +7,4 @@ The result looks good.
 ![alt text](https://github.com/xjevent1z/machine-learning/blob/feature/linear-regression/weather/train_result.png)
 ### Import testing data
 The result is bad, needs to fine-tune the model.
-![alt text](https://github.com/xjevent1z/machine-learning/blob/feature/linear-regression/weather/train_result.png)
+![alt text](https://github.com/xjevent1z/machine-learning/blob/feature/linear-regression/weather/test_result.png)
