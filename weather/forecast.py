@@ -125,20 +125,31 @@ class Forcast:
         # plt.show()
         optimizer = tf.optimizers.Adagrad(1.01)
         w1, w2, b = _w1, _w2, _b
-        for _iter in range(10000):
+        _lambda = 9.2035e-7
+        for _iter in range(1000):
             with tf.GradientTape() as tape:
                 y_hat = tf.add_n([tf.matmul(tf.pow(self.train_x, 2), w1), tf.matmul(
                     self.train_x, w2), b])  # 12 x 20 matrix
-                loss = tf.reduce_mean(tf.pow(self.train_y - y_hat, 2))
+                loss = tf.reduce_mean(
+                    tf.pow(self.train_y - y_hat, 2)) + _lambda * (
+                        tf.reduce_sum(tf.pow(w1, 2)) + tf.reduce_sum(tf.pow(w2, 2)))
             gradients = tape.gradient(loss, [w1, w2, b])
             optimizer.apply_gradients(zip(gradients, [w1, w2, b]))
         y_pred = tf.add_n([tf.matmul(tf.pow(self.train_x, 2), w1), tf.matmul(
             self.train_x, w2), b])
 
+        y_pred_real = tf.add_n([tf.matmul(tf.pow(self.test_x, 2), w1), tf.matmul(
+            self.train_x, w2), b])
+
         plt.plot(np.arange(len(self.train_x)),
-                 self.train_y, 'y^:', label='y_train')
+                 self.test_y, 'y^:', label='y_train')
         plt.plot(np.arange(len(self.train_x)),
-                 y_pred, 'r--', label='y_pred')
+                 y_pred_real, 'r--', label='y_pred')
+
+        # plt.plot(np.arange(len(self.train_x)),
+        #          self.test_y, 'b^:', label='y_real')
+        # plt.plot(np.arange(len(self.train_x)),
+        #          y_pred_real, 'g--', label='y_pred_real')
         plt.legend()
         plt.show()
 
