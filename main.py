@@ -1,7 +1,7 @@
 """The main program to call"""
 # from particulates import PM25
-# from weather import Forcast
-from classification import Income
+from weather import Forcast
+# from classification import Income
 
 # def test():
 #     X = np.random.rand(10).astype(np.float32)
@@ -51,17 +51,12 @@ from classification import Income
 
 
 if __name__ == "__main__":
-    # PM = PM25()
-    # PM.read_train('particulates/input/train.csv')
-    # PM.read_test('particulates/input/test.csv')
-    # PM.train_model_tensorflow()
-    # PM.train_model_sklearn()
-    # PM.draw()
-    # agent = Forcast()
-    # agent.read_train()
-    # agent.read_test()
-    # agent.train_model()
-    # test()
-    AGENT = Income()
-    AGENT.encode('classification/simple.csv')
-    AGENT.training()
+    AGENT = Forcast()
+    AGENT.read_train()
+    AGENT.read_test()
+    AGENT.train_model()
+    AGENT.draw('train', 'train.png')
+    AGENT.draw('test', 'test.png')
+    # AGENT = Income()
+    # AGENT.encode('classification/simple.csv')
+    # AGENT.training()
