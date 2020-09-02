@@ -62,9 +62,8 @@ class Forcast:
         _list = [[_rand] for _ in range(len(self.train_x))]
         b = tf.Variable(_list, dtype=float)  # 12 x 1
 
-        _lambda = 1e-1
         optimizer = tf.optimizers.SGD(1e-7)
-
+        _lambda = 1e-2
         for _iter in range(10000):
             with tf.GradientTape() as tape:
                 y_hat = tf.add_n([tf.matmul(tf.pow(self.train_x, 2), w1), tf.matmul(self.train_x, w2), b])
@@ -73,21 +72,56 @@ class Forcast:
                     _lambda * tf.reduce_sum(tf.pow(w2, 2)) / (tf.reduce_sum(tf.pow(w1, 2)) + tf.reduce_sum(tf.pow(w2, 2)))
             gradients = tape.gradient(loss, [w1, w2, b])
             optimizer.apply_gradients(zip(gradients, [w1, w2, b]))
-
         self.y_pred1 = tf.add_n([tf.matmul(tf.pow(self.train_x, 2), w1), tf.matmul(self.train_x, w2), b])
         self.y_pred2 = tf.add_n([tf.matmul(tf.pow(self.test_x, 2), w1), tf.matmul(self.test_x, w2), b])
+
+        # _range = [float('1e{}'.format(exp)) for exp in np.linspace(-3,2,6, dtype=int)]
+        # for index, _lambda in enumerate(_range):
+        #     for _iter in range(10000):
+        #         with tf.GradientTape() as tape:
+        #             y_hat = tf.add_n([tf.matmul(tf.pow(self.train_x, 2), w1), tf.matmul(self.train_x, w2), b])
+        #             loss = tf.reduce_mean(tf.pow(y_hat - self.train_y, 2)) + \
+        #                 _lambda * tf.reduce_sum(tf.pow(w1, 2)) / (tf.reduce_sum(tf.pow(w1, 2)) + tf.reduce_sum(tf.pow(w2, 2))) + \
+        #                 _lambda * tf.reduce_sum(tf.pow(w2, 2)) / (tf.reduce_sum(tf.pow(w1, 2)) + tf.reduce_sum(tf.pow(w2, 2)))
+        #         gradients = tape.gradient(loss, [w1, w2, b])
+        #         optimizer.apply_gradients(zip(gradients, [w1, w2, b]))
+
+        #     self.y_pred1 = tf.add_n([tf.matmul(tf.pow(self.train_x, 2), w1), tf.matmul(self.train_x, w2), b])
+        #     self.y_pred2 = tf.add_n([tf.matmul(tf.pow(self.test_x, 2), w1), tf.matmul(self.test_x, w2), b])
+
+        #     if index == 0:
+        #         plt.plot(np.arange(1, 13), self.y_pred1, 'r:', label='lambda_{}'.format(_lambda))
+        #     if index == 1:
+        #         plt.plot(np.arange(1, 13), self.y_pred1, 'g:', label='lambda_{}'.format(_lambda))
+        #     if index == 2:
+        #         plt.plot(np.arange(1, 13), self.y_pred1, 'b:', label='lambda_{}'.format(_lambda))
+        #     if index == 3:
+        #         plt.plot(np.arange(1, 13), self.y_pred1, 'c:', label='lambda_{}'.format(_lambda))
+        #     if index == 4:
+        #         plt.plot(np.arange(1, 13), self.y_pred1, 'y:', label='lambda_{}'.format(_lambda))
+        #     if index == 5:
+        #         plt.plot(np.arange(1, 13), self.y_pred1, 'm:', label='lambda_{}'.format(_lambda))
+
+        #     loss = tf.reduce_mean(tf.pow(self.y_pred1 - self.train_y, 2))
+        #     print('Loss = {} with lambda {}'.format(loss, _lambda))
+
+        # plt.xticks(range(1, 13))
+        # plt.legend()
+        # plt.savefig(os.path.join(os.path.dirname(__file__), 'lambda.png'))
+        # plt.close()
 
     def draw(self, tag, _file):
         """Draw the figure"""
         if tag == 'train':
             plt.plot(np.arange(1, 13), self.train_y, 'r.', label='y_train')
             plt.plot(np.arange(1, 13), self.y_pred1, 'm:', label='y_pred')
-        if tag == 'test':
+            loss = tf.reduce_mean(tf.pow(self.y_pred1 - self.train_y, 2))
+        elif tag == 'test':
             plt.plot(np.arange(1, 13), self.real_y, 'bD', label='y_real')
             plt.plot(np.arange(1, 13), self.y_pred2, 'm:', label='y_pred')
+            loss = tf.reduce_mean(tf.pow(self.y_pred2 - self.real_y, 2))
         plt.xticks(range(1, 13))
-        plt.title('Loss = {}'.format(tf.reduce_mean(tf.pow(self.y_pred1 - self.train_y, 2))))
+        plt.title('Loss = {}'.format(loss))
         plt.legend()
-        _file = os.path.join(os.path.dirname(__file__), _file)
-        plt.savefig(_file)
-        plt.show()
+        plt.savefig(os.path.join(os.path.dirname(__file__), _file))
+        plt.close()
