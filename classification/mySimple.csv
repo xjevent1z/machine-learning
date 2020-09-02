@@ -1,5 +1,0 @@
-   workclass_ Self-emp-not-inc  workclass_ State-gov  education_ Bachelors  marital_status_ Married-civ-spouse  marital_status_ Never-married  ...   fnlwgt  education_num  capital_gain  capital_loss  hours_per_week
-0                            0                     1                     1                                   0                              1  ...    77516             13          2174             0              40
-1                            1                     0                     1                                   1                              0  ...    83311             13             0             0              13
-
-[2 rows x 18 columns]

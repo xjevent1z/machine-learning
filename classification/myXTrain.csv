@@ -1,4 +1,0 @@
-workclass_ Self-emp-not-inc,workclass_ State-gov,education_ Bachelors,education_ Masters,marital_status_ Divorced,marital_status_ Married-civ-spouse,marital_status_ Never-married,occupation_ Adm-clerical,occupation_ Exec-managerial,relationship_ Husband,relationship_ Not-in-family,relationship_ Unmarried,race_ White,sex_ Female,sex_ Male,native_country_ United-States,age, fnlwgt,education_num,capital_gain,capital_loss,hours_per_week
-0,1,1,0,0,0,1,1,0,0,1,0,1,0,1,1,39,77516,13,2174,0,40
-1,0,1,0,0,1,0,0,1,1,0,0,1,0,1,1,50,83311,13,0,0,13
-1,0,0,1,1,0,0,0,1,0,0,1,1,1,0,1,43,292175,14,0,0,45
